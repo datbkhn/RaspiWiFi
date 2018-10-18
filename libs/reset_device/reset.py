@@ -5,7 +5,8 @@ import subprocess
 import reset_lib
 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+BUTTON = 17 # adapt to mic hat 2
+GPIO.setup(BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 counter = 0
 serial_last_four = subprocess.check_output(['cat', '/proc/cpuinfo'])[-5:-1].decode('utf-8')
@@ -21,7 +22,7 @@ if hostapd_reset_required == True:
 # This is the main logic loop waiting for a button to be pressed on GPIO 18 for 10 seconds.
 # If that happens the device will reset to its AP Host mode allowing for reconfiguration on a new network.
 while True:
-    while GPIO.input(18) == 1:
+    while GPIO.input(BUTTON) == 0:
         time.sleep(1)
         counter = counter + 1
 
@@ -30,7 +31,7 @@ while True:
         if counter == 9:
             reset_lib.reset_to_host_mode()
 
-        if GPIO.input(18) == 0:
+        if GPIO.input(BUTTON) == 1:
             counter = 0
             break
 
